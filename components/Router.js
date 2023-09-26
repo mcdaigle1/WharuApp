@@ -3,11 +3,27 @@ import { TabNavigator, StackNavigator } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 
 import BlackComponent from './test/BlackComponent';
-import GreyComponent from './test/GreyComponent';
+import EventList from './events/EventList';
+import EventDetail from './events/EventDetail';
+
+export const EventStack = StackNavigator({
+	EventList: {
+		screen: EventList,
+		navigationOptions: {
+			title: 'Your Events'
+		},
+	},
+	EventDetail: {
+		screen: EventDetail,
+		navigationOptions: ({ navigation }) => ({
+			title: `${navigation.state.params.name}`,
+		}),
+	},
+});
 
 export const TestTabs = TabNavigator({
-  GreyComponent: {
-    screen: GreyComponent,
+  EventStack: {
+    screen: EventStack,
     navigationOptions: {
       tabBarLabel: 'Events',
       tabBarIcon: ({ tintColor }) => <Icon name="list" size={35} color={tintColor} />,
@@ -21,3 +37,4 @@ export const TestTabs = TabNavigator({
     },
   },
 });
+

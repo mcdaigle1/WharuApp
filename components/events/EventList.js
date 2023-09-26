@@ -1,55 +1,77 @@
-import React, { Component } from "react";
-import { ScrollView } from 'react-native';
+import React, { Component } from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { List, ListItem } from 'react-native-elements';
 
-class EventList extends Component {
+import HashStore from '../../utilities/HashStore'
+import EventsHeader from './EventsHeader'
+
+/*
+ * Displays a list of events for a single user, including events they own and events they
+ * belong to
+ */
+export default class EventList extends Component {
 	constructor(props) {
 		super(props);
-		var events = [
-			{	"id": 1,
-				"name": "Test Event",
-				"description": "Test event for development purposes",
-				"start_time": "2017-06-19 18:00:00",
-				"end_time": "2017-06-19 22:00:00",
-				"status": 0
-			},
-			{	
-				"id": 2,
-				"name": "Test Event2",
-				"description": "Test event2 for development purposes",
-				"start_time": "2017-06-20 18:00:00",
-				"end_time": "2017-06-20 22:00:00",
-				"status": 0
-			}
-		]
+
+		this.userEventsSubscription = null;
+		let userEvents = [];
+		this.state = {userEvents: userEvents};
 	}
 
+	/*
+	 * Show a scroll view of events for the current user
+	 */
 	render() {
 		return (
-			<ScrollView>
-				<List>
-					{events.map((event) => (
-						<ListItem
-							key={event.id}
-							title={event.name}
-							subtitle={event.description}
-							onPress={() => this.onLearnMore(event)}
-						/>
-					))}
-					</List>
-			</ScrollView>
+			<View style={styles.container}>	
+				<EventsHeader style={styles.eventsHeader} />
+				<ScrollView style={styles.eventsList}>
+					<List>
+						{this.state.userEvents.map((userEvent) => (
+							<ListItem
+								key={userEvent.event.id}
+								title={userEvent.name}
+								subtitle={userEvent.event.description}
+								onPress={() => this.onShowEvent(userEvent.event)}
+							  />
+						))}
+						</List>
+				</ScrollView>
+			</View>
 		);
 	}
 	
-	onLearnMore = (event) => {
-		//this.props.navigation.navigate('Details', { ...event });
+	/*
+	 * Add a listener for userEvents updates.  Re-render the events list on change.
+	 */
+    componentWillMount() {
+    	let hashStore = new HashStore();
+    	this.userEventsSubscription = hashStore.addListener('WA:userEvents', () => {
+    		let userEventsJson = hashStore.getValue('WA:userEvents');
+    		this.setState({userEvents: JSON.parse(userEventsJson)})
+    	});
+    }
+	
+    /*
+     * If an event is selected from the user event list, navigate to the EventDetail page
+     */
+	onShowEvent = (event) => {
+		this.props.navigation.navigate('EventDetail', { ...event });
 	};
 }
 
 const styles = StyleSheet.create({
 	container: {
-		height: 50,
-		backgroundColor: "#cccccc"
-		
+		flex: 1,
+		backgroundColor: 'green'
+	},
+	eventsHeader: {
+		flex: 1,
+		flexDirection: 'row',
+		backgroundColor: 'blue'
+	},
+	eventsList: {
+		flex: 5,
+		backgroundColor: 'yellow'
 	}
 }); 

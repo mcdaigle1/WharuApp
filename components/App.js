@@ -1,49 +1,41 @@
 import React, { Component } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { TestTabs } from './Router';
 import HashStore from "../utilities/HashStore"
-import Header from "./header/Header"
-import Menu from "./menu/MyMenu"
+import EventHelper from "../utilities/EventHelper"
 import GreyComponent from "./test/GreyComponent"
 import BlackComponent from "./test/BlackComponent"
-import { TestTabs } from './Router';
 
+/* 
+ * Main application component
+ */
 export default class App extends Component {
 	constructor(props) {
 		super(props);
 		
-		this.state = {loginInfo: HashStore.getValue("loginInfo")}
+		let loginInfo = {
+			userEmail: "mcdaigle1@gmail.com",
+			userId: 2
+		}
+		
+		//this.state = {loginInfo: HashStore.getValue("loginInfo")}
+		this.state = {loginInfo: loginInfo}
 	}
-
-//	render() {
-//		return (
-//			<View style={appStyles.container}>
-//				<Header />
-//				{this.state.loginInfo == null && <MyMenu />}	
-//				<MyMenu />
-//			    <Router>
-//			    	<Scene key="root">
-//			        	<Scene 
-//			        		key="black"
-//			        		component={BlackComponent}
-//			        		title="Black"
-//			        		initial
-//			        	/>
-//			        	<Scene
-//			        		key="grey"
-//			        		component={GreyComponent}
-//			        		title="Grey"
-//			        	/>
-//			        </Scene>
-//			    </Router>
-//			</View>
-//		);
-//	}
 	
 	render() {
 		return (
 		    <TestTabs />
 		);
+	}
+	
+	/*
+	 * Get the user events for this user and add it to the hash store.  
+	 */
+	componentWillMount() {
+		let hashStore = new HashStore();
+		hashStore.removeValue('WA:userEvents');
+		this.state.loginInfo != null && EventHelper.getUserEventsForUser(this.state.loginInfo.userId);
 	}
 }
 
